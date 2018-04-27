@@ -12,9 +12,10 @@ su_data <- function(inputMatrix, funcs, envir = parent.frame()){
 
 sum_by_group <- function(inputs, funcs, groups, envir = parent.frame()){
   outputData <- matrix(nrow = dim(inputs)[2] - 1, ncol = 0)
-  for(i in 1:nlevels(inputs[,which(names(inputs) == as.name(groups))])){
-    sub_data <- subset(inputs, inputs[,which(names(inputs) == groups)] == levels(inputs[,which(names(inputs) == groups)])[i])
-    sub_data <- su_data(sub_data[,-which(names(sub_data) == as.name(groups))], funcs, envir)
+  sinputs <- split(inputs, inputs[,which(colnames(inputs) == groups)])
+  sinputs <- lapply(sinputs, function(x) x[,-which(colnames(x) == as.name(groups))])
+  for(i in 1:length(sinputs)){
+    sub_data <- su_data(sinputs[[i]], funcs, envir)
     colnames(sub_data) <- paste(colnames(sub_data), ", ", groups, " = ", as.character(levels(inputs[,which(names(inputs) == groups)])[i]), sep = "")
     outputData <- cbind(outputData, sub_data)
   }
